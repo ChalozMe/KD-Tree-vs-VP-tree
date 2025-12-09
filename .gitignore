@@ -1,0 +1,37 @@
+
+# Compilados
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.lib
+*.out
+*.exe
+
+# Carpetas de construcción
+/build/
+build/
+cmake-build-*/
+CMakeFiles/
+
+# Archivos generados por CMake
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+install_manifest.txt
+
+# Archivos temporales
+*.tmp
+*.log
+*.bak
+*.swp
+*.swo
+
+# Archivos de Python (por generator.py)
+__pycache__/
+*.pyc
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
