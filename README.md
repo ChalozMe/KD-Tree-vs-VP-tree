@@ -18,6 +18,7 @@ Mantiene un mejor rendimiento en espacios de mayor dimensionalidad mientras la d
 
 ## Estructura del Proyecto
 
+```bash
 proyecto-knn/
 ├── README.md
 ├── .gitignore
@@ -38,3 +39,4 @@ proyecto-knn/
 │ └── generator.py
 │
 └── CMakeLists.txt
+```
