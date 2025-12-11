@@ -7,6 +7,8 @@
 
 #include "point.hpp"
 #include "kd_tree.hpp"
+#include "vp_tree.hpp"
+
 
 // ------------------------------------------------------------
 // Cargar CSV numérico a vectores<double>
@@ -113,10 +115,33 @@ int main() {
         for (int i = 0; i < neighbors.size(); i++) {
             const auto& [p, dist] = neighbors[i];
 
-            std::cout << "Vecino " << i+1 << ": [ ";
+            std::cout << "NN " << i+1 << ": [ ";
             for (int d = 0; d < p.dimension(); d++)
                 std::cout << p[d] << " ";
-            std::cout << "]  Distancia = " << dist << "\n";
+            std::cout << "]  Dist = " << dist << "\n";
+        }
+
+        std::cout << "\nTry KNN (VP-Tree):\n";
+        // Crear VP-Tree
+        VPTree vptree;
+
+        // Insertar puntos
+        for (const auto& p : pts)
+            vptree.insert(p);
+
+        // Probar KNN
+        auto neighborsVP = vptree.knn(query, K);
+
+        // Mostrar resultados
+        for (size_t i = 0; i < neighborsVP.size(); ++i) {
+            const auto& pr = neighborsVP[i];
+            const Point& p = pr.first;
+            double dist = pr.second;
+
+            std::cout << "NN " << i+1 << ": [ ";
+            for (int d = 0; d < p.dimension(); ++d)
+                std::cout << p[d] << " ";
+            std::cout << "]  Dist = " << dist << "\n";
         }
 
 

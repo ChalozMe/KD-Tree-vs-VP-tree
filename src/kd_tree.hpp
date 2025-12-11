@@ -27,14 +27,15 @@ public:
 
 private:
     struct Node {
-        Point point;
-        std::unique_ptr<Node> left;
-        std::unique_ptr<Node> right;
-        size_t axis;
+    Point point;
+    size_t axis;                     // 1. axis primero
+    std::unique_ptr<Node> left;      // 2. left después
+    std::unique_ptr<Node> right;
 
-        Node(const Point& p, size_t axis)
-            : point(p), axis(axis), left(nullptr), right(nullptr) {}
-    };
+    Node(const Point& p, size_t axis)
+        : point(p), axis(axis), left(nullptr), right(nullptr)
+    {}
+};
 
     std::unique_ptr<Node> root;
     size_t dims;
