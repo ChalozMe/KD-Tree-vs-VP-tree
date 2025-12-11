@@ -12,7 +12,7 @@
 static double dist_sq(const Point& a, const Point& b) {
     if (a.dimension() != b.dimension()) return std::numeric_limits<double>::infinity();
     double s = 0.0;
-    for (int i = 0; i < a.dimension(); ++i) {
+    for (size_t i = 0; i < a.dimension(); ++i) {
         double d = a[i] - b[i];
         s += d * d;
     }

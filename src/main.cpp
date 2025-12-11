@@ -90,12 +90,12 @@ int main() {
 
         // Mostrar vector
         std::cout << "Query: [ ";
-        for (int i = 0; i < query.dimension(); i++)
+        for (size_t i = 0; i < query.dimension(); i++)
             std::cout << query[i] << " ";
         std::cout << "]\n";
 
         std::cout << "NN:    [ ";
-        for (int i = 0; i < best.dimension(); i++)
+        for (size_t i = 0; i < best.dimension(); i++)
             std::cout << best[i] << " ";
         std::cout << "]\n";
 
@@ -112,11 +112,11 @@ int main() {
 
         auto neighbors = tree.knn(query, K);
 
-        for (int i = 0; i < neighbors.size(); i++) {
+        for (size_t i = 0; i < neighbors.size(); i++) {
             const auto& [p, dist] = neighbors[i];
 
             std::cout << "NN " << i+1 << ": [ ";
-            for (int d = 0; d < p.dimension(); d++)
+            for (size_t d = 0; d < p.dimension(); d++)
                 std::cout << p[d] << " ";
             std::cout << "]  Dist = " << dist << "\n";
         }
@@ -139,7 +139,7 @@ int main() {
             double dist = pr.second;
 
             std::cout << "NN " << i+1 << ": [ ";
-            for (int d = 0; d < p.dimension(); ++d)
+            for (size_t d = 0; d < p.dimension(); ++d)
                 std::cout << p[d] << " ";
             std::cout << "]  Dist = " << dist << "\n";
         }

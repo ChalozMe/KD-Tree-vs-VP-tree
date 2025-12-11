@@ -11,7 +11,7 @@ class Point
         Point()= default;
         Point(const std::vector<double>& v) : coords(v) {}
 
-        inline int dimension() const 
+        inline size_t dimension() const 
         {
             return coords.size();
         }
@@ -33,7 +33,7 @@ class Point
                 throw std::runtime_error("Dimensiones diferentes entre ambos puntos");
             
             double sum = 0.0;
-            for (int i = 0; i < a.dimension(); i++)
+            for (size_t i = 0; i < a.dimension(); i++)
             {
                 double diff = a[i] - b[i];
                 sum += diff * diff;
