@@ -1,5 +1,11 @@
 # KNN Comparison using KD-Tree and VP-Tree
 
+Comando Magico para provar:
+```bash
+g++ -std=c++17 -O2 -Wall -Isrc src/*.cpp -o test
+```
+
+
 ## Descripción del Trabajo
 Este proyecto implementa y compara dos estructuras de datos multidimensionales para realizar búsquedas **K-Nearest Neighbors (KNN)** sobre vectores de características.  
 Se evalúan métricas de **tiempo de inserción**, **tiempo de búsqueda** y **uso de memoria**, utilizando datasets generados sintéticamente.
