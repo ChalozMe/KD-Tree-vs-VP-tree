@@ -11,7 +11,7 @@ int main() {
     try {
         std::cout << "Cargando dataset...\n";
 
-        const std::string file = "data/50Dim_10000len.csv";
+        const std::string file = "data/40Dim_4000len.csv";
 
         std::vector<Point> pts = loadCSV(file);
         if (pts.empty()) {
@@ -46,11 +46,11 @@ int main() {
         Point best = tree.nearest_neighbor(query);
 
         std::cout << "Query: ";
-        printPoint(query);
+        printPoint(query,2);
         std::cout << "\n";
 
         std::cout << "NN:    ";
-        printPoint(best);
+        printPoint(best,2);
         std::cout << "\n";
 
         double dist = Point::distance(query, best);
@@ -66,7 +66,7 @@ int main() {
             const auto& [p, dist] = neighbors[i];
 
             std::cout << "NN " << i+1 << ": ";
-            printPoint(p);
+            printPoint(p,2);
             std::cout << "   Dist = " << dist << "\n";
         }
 
@@ -87,7 +87,7 @@ int main() {
             const auto& [p, dist] = neighborsVP[i];
 
             std::cout << "NN " << i+1 << ": ";
-            printPoint(p);
+            printPoint(p,2);
             std::cout << "   Dist = " << dist << "\n";
         }
 

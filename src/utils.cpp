@@ -1,6 +1,7 @@
 #include "utils.hpp"
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <chrono>
@@ -45,17 +46,21 @@ std::vector<Point> loadCSV(const std::string& filename) {
 // ------------------------------------------------------------
 // PPRINT (pretty-print c:)
 // ------------------------------------------------------------
-void printPoint(const Point& p) {
+void printPoint(const Point& p, int precision) {
     std::cout << "[ ";
-    for (size_t i = 0; i < p.dimension(); ++i)
-        std::cout << p[i] << " ";
-    std::cout << "]";
-}
+    std::cout << std::fixed << std::setprecision(precision);
 
+    for (size_t i = 0; i < p.dimension(); ++i) {
+        std::cout << p[i];
+        if (i + 1 < p.dimension()) std::cout << ", ";
+    }
+
+    std::cout << " ]";
+}
 void printVectorPoint(const std::vector<Point>& pts) {
     for (size_t i = 0; i < pts.size(); ++i) {
         std::cout << i << ": ";
-        printPoint(pts[i]);
+        printPoint(pts[i],2);
         std::cout << "\n";
     }
 }

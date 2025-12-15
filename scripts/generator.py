@@ -3,28 +3,29 @@ import random
 import numpy as np
 
 # CONFIGURACIÓN -------------------------
-N = 10000                                          # cantidad de datos
-DIM_GENRES = 47                                  # número de géneros (inflar dimensiones)
+N = 4000                          # cantidad de datos
+DIM_GENRES = 37                    # número de géneros
 SEED = 23
-TOTAL_DIM = DIM_GENRES + 3                      # anho rating y duracion son fijos
+TOTAL_DIM = DIM_GENRES + 3         # año, rating y duración
 OUTPUT = f"data/{TOTAL_DIM}Dim_{N}len.csv"
-
-# END CONFIG----------------------------
+# --------------------------------------
 
 random.seed(SEED)
 np.random.seed(SEED)
 
-# Funciones
+# FUNCIONES -----------------------------
 
 def generate_genre_vector(dim):
-    return np.random.dirichlet([1]*dim)         #Vector de géneros que suma 1.
+    # Vector de géneros que suma 1
+    return np.random.dirichlet([1] * dim)
 
 def normalize(x, minv, maxv):
     return (x - minv) / (maxv - minv)
 
-# Generacion de dataset, todo random y normalizado
+# GENERACIÓN ----------------------------
 
 rows = []
+
 for i in range(N):
     genres = generate_genre_vector(DIM_GENRES)
 
@@ -43,25 +44,27 @@ for i in range(N):
         "title": f"Movie_{i}",
     }
 
-    # reducir a 2 decimales
+    # SIN redondeo
     for g in range(DIM_GENRES):
-        row[f"genre_{g}"] = round(float(genres[g]), 2)
+        row[f"genre_{g}"] = float(genres[g])
 
-    row["year_norm"] = round(year_n, 2)
-    row["rating_norm"] = round(rating_n, 2)
-    row["duration_norm"] = round(duration_n, 2)
+    row["year_norm"] = year_n
+    row["rating_norm"] = rating_n
+    row["duration_norm"] = duration_n
 
     rows.append(row)
 
 # GUARDAR CSV ----------------------------
 
-fieldnames = ["id", "title"] \
-             + [f"genre_{g}" for g in range(DIM_GENRES)] \
-             + ["year_norm", "rating_norm", "duration_norm"]
+fieldnames = (
+    ["id", "title"]
+    + [f"genre_{g}" for g in range(DIM_GENRES)]
+    + ["year_norm", "rating_norm", "duration_norm"]
+)
 
 with open(OUTPUT, "w", newline="") as f:
     writer = csv.DictWriter(f, fieldnames)
     writer.writeheader()
     writer.writerows(rows)
 
-print(f"Dataset generado: {OUTPUT} ({N} filas, {DIM_GENRES+3} dimensiones)")
+print(f"Dataset generado: {OUTPUT} ({N} filas, {TOTAL_DIM} dimensiones)")
