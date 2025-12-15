@@ -11,7 +11,7 @@ int main() {
     try {
         std::cout << "Cargando dataset...\n";
 
-        const std::string file = "data/5Dim_20len.csv";
+        const std::string file = "data/10Dim_1000len.csv";
 
         std::vector<Point> pts = loadCSV(file);
         if (pts.empty()) {
