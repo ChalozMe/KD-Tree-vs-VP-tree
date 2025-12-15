@@ -11,7 +11,7 @@ int main() {
     try {
         std::cout << "Cargando dataset...\n";
 
-        const std::string file = "data/10Dim_1000len.csv";
+        const std::string file = "data/50Dim_10000len.csv";
 
         std::vector<Point> pts = loadCSV(file);
         if (pts.empty()) {
@@ -24,7 +24,7 @@ int main() {
                   << " puntos con " << dims << " dimensiones.\n";
 
         KDTree tree(dims);
-
+        uint64_t t0 = now_ms();
         // Insertar todos los puntos
         for (auto &p : pts) {
             if (p.dimension() != dims) {
@@ -33,9 +33,11 @@ int main() {
             }
             tree.insert(p);
         }
+        uint64_t t1 = now_ms();
 
         std::cout << "Inserción completada.\n";
         std::cout << "Memoria aprox: " << tree.memoryUsage() << " bytes\n";
+        std::cout << "Tiempo utilizado " << (t1 - t0) << " us\n";
 
         // Probar KNN (1-NN)
         Point query = pts[5];
@@ -72,8 +74,12 @@ int main() {
 
         VPTree vptree;
 
+        uint64_t t3 = now_ms();
+
         for (const auto& p : pts)
             vptree.insert(p);
+
+        uint64_t t4 = now_ms();
 
         auto neighborsVP = vptree.knn(query, K);
 
@@ -84,6 +90,9 @@ int main() {
             printPoint(p);
             std::cout << "   Dist = " << dist << "\n";
         }
+
+        std::cout << "Memoria aprox: " << vptree.memoryUsage() << " bytes\n";
+        std::cout << "Tiempo utilizado " << (t4 - t3) << " us\n";
 
     } catch (std::exception &e) {
         std::cerr << "Error: " << e.what() << "\n";
