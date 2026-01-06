@@ -7,6 +7,50 @@
 
 KDTree::KDTree(size_t dimensions) : root(nullptr), dims(dimensions), node_count(0) {}
 
+void KDTree::build(const std::vector<Point>& points) {
+    if (points.empty()) {
+        root.reset();
+        node_count = 0;
+        return;
+    }
+
+    std::vector<Point> pts = points; // copia de trabajo
+    node_count = pts.size();
+    root = build_recursive(pts, 0);
+}
+
+std::unique_ptr<KDTree::Node>
+KDTree::build_recursive(std::vector<Point>& pts, size_t depth) {
+    if (pts.empty())
+        return nullptr;
+
+    size_t axis = depth % dims;
+    size_t mid  = pts.size() / 2;
+
+    // Partición por mediana en el eje actual
+    std::nth_element(
+        pts.begin(),
+        pts.begin() + mid,
+        pts.end(),
+        [axis](const Point& a, const Point& b) {
+            return a[axis] < b[axis];
+        }
+    );
+
+    // Crear nodo con la mediana
+    auto node = std::make_unique<Node>(pts[mid], axis);
+
+    // Subconjuntos
+    std::vector<Point> leftPts(pts.begin(), pts.begin() + mid);
+    std::vector<Point> rightPts(pts.begin() + mid + 1, pts.end());
+
+    node->left  = build_recursive(leftPts,  depth + 1);
+    node->right = build_recursive(rightPts, depth + 1);
+
+    return node;
+}
+
+
 void KDTree::insert(const Point &p) {
     insert_recursive(root, p, 0);
 }
@@ -83,7 +127,8 @@ size_t KDTree::memoryUsage() const {
 
 
 //KNN TRY
-std::vector<std::pair<Point,double>> KDTree::knn(const Point& target, int k) const {
+std::vector<std::pair<Point,double>> KDTree::knn(const Point& target, int k, size_t& visited) const {
+    visited = 0;
     if (!root || k <= 0) return {};
 
     std::priority_queue<
@@ -92,7 +137,7 @@ std::vector<std::pair<Point,double>> KDTree::knn(const Point& target, int k) con
         KNNComparator
     > heap;
 
-    knn_recursive(root.get(), target, k, heap);
+    knn_recursive(root.get(), target, k, heap, visited);
 
     std::vector<std::pair<Point,double>> result;
     while (!heap.empty()) {
@@ -113,9 +158,12 @@ void KDTree::knn_recursive(
         std::pair<double,Point>,
         std::vector<std::pair<double,Point>>,
         KNNComparator
-    >& heap
+    >& heap,
+    size_t& visited
 ) const {
     if (!node) return;
+
+    ++visited; //NODO VISITADO
 
     double d = distance_sq(node->point, target);
 
@@ -134,11 +182,11 @@ void KDTree::knn_recursive(
     const Node* first  = go_left ? node->left.get()  : node->right.get();
     const Node* second = go_left ? node->right.get() : node->left.get();
 
-    knn_recursive(first, target, k, heap);
+    knn_recursive(first, target, k, heap, visited);
 
     double diff = target[axis] - node->point[axis];
     double diff_sq = diff * diff;
 
     if ((int)heap.size() < k || diff_sq < heap.top().first)
-        knn_recursive(second, target, k, heap);
+        knn_recursive(second, target, k, heap, visited);
 }

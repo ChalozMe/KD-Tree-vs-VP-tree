@@ -31,7 +31,7 @@ public:
     Point nearest_neighbor(const Point& q) const;
 
     // K nearest neighbors: devuelve pares (Point, dist)
-    std::vector<std::pair<Point,double>> knn(const Point& q, int k) const;
+    std::vector<std::pair<Point,double>> knn(const Point& q, int k, size_t& visited) const;
 
     // Estimación simple de memoria
     size_t memoryUsage() const;
@@ -55,7 +55,7 @@ private:
     void knn_search(const Node* node, const Point& q, int k,
                     std::priority_queue<std::pair<double,Point>,
                                         std::vector<std::pair<double,Point>>,
-                                        VPKNNComparator>& heap) const;
+                                        VPKNNComparator>& heap, size_t& visited) const;
 };
 
 #endif // VP_TREE_HPP

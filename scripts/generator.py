@@ -3,11 +3,11 @@ import random
 import numpy as np
 
 # CONFIGURACIÓN -------------------------
-N = 4000                          # cantidad de datos
-DIM_GENRES = 37                    # número de géneros
+N = 5000                          # cantidad de datos
+DIM_GENRES = 17                  # número de géneros
 SEED = 23
 TOTAL_DIM = DIM_GENRES + 3         # año, rating y duración
-OUTPUT = f"data/{TOTAL_DIM}Dim_{N}len.csv"
+OUTPUT = f"data/set_N_Visited/{TOTAL_DIM}Dim_{N}len.csv"
 # --------------------------------------
 
 random.seed(SEED)

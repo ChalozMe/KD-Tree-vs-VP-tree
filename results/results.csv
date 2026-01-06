@@ -1,0 +1,3 @@
+structure,time_us,memory_bytes
+KDTree,136,48000
+VPTree,101320,48000
