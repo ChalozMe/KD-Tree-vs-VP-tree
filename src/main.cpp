@@ -1,23 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cstdlib>   // system()
+#include <sstream>
+#include <iomanip>
 
 #include "point.hpp"
 #include "kd_tree.hpp"
 #include "vp_tree.hpp"
 #include "utils.hpp"
-
-void printMenu() {
-    std::cout << "\n===== MENU =====\n";
-    std::cout << "1. Construir KD-Tree\n";
-    std::cout << "2. Construir VP-Tree\n";
-    std::cout << "3. Buscar NN (KD-Tree)\n";
-    std::cout << "4. Buscar KNN (KD-Tree)\n";
-    std::cout << "5. Buscar KNN (VP-Tree)\n";
-    std::cout << "6. Mostrar memoria usada\n";
-    std::cout << "0. Salir\n";
-    std::cout << "Opcion: ";
-}
 
 int main() {
     try {
@@ -153,6 +144,161 @@ int main() {
                 break;
             }
 
+            
+            case 7: {
+                CompMenu();
+                int comp_option;
+                std::cin >> comp_option;
+                switch(comp_option) {
+                    case 1: {
+                        std::vector<int> dims = {5,10,20,50,100};
+                        std::ofstream out("results/results_knn_vs_dim.csv");
+                        out << "Dim,Time_KD,Time_VP\n";
+
+                        for (int d : dims) {
+                            std::string fname = "data/set_KNNvsD/" + std::to_string(d) + "Dim_"+std::to_string(50000)+"len.csv";
+                            auto data = loadCSV(fname);
+                            Point q = data[0];
+
+                            KDTree kd(d);
+                            VPTree vp;
+
+                            kd.build(data);
+                            vp.build(data);
+
+                            size_t vkd = 0, vvp = 0;
+
+                            uint64_t t0 = now_ms();
+                            kd.knn(q, 5, vkd);
+                            uint64_t t1 = now_ms();
+
+                            uint64_t t2 = now_ms();
+                            vp.knn(q, 5, vvp);
+                            uint64_t t3 = now_ms();
+
+                            writeCSVRow(out, {
+                                (double)d,
+                                (double)(t1 - t0),
+                                (double)(t3 - t2)
+                            });
+                        }
+
+                        out.close();
+                        runPython("plots/knn_vs_dim.py");
+                        break;
+                    }
+
+                    case 2: {
+                        std::vector<int> sizes = {1000,10000,50000,100000};
+                        std::ofstream out("results/results_knn_vs_size.csv");
+                        out << "Size,Time_KD,Time_VP\n";
+
+                        for (int s : sizes) {
+                            std::string fname = "data/set_KNNvsTAM/" + std::to_string(20) + "Dim_"+std::to_string(s)+"len.csv";
+                            auto data = loadCSV(fname);
+                            size_t d = data[0].dimension();
+                            Point q = data[0];
+
+                            KDTree kd(d);
+                            VPTree vp;
+
+                            kd.build(data);
+                            vp.build(data);
+
+                            size_t vkd = 0, vvp = 0;
+
+                            uint64_t t0 = now_ms();
+                            kd.knn(q, 5, vkd);
+                            uint64_t t1 = now_ms();
+
+                            uint64_t t2 = now_ms();
+                            vp.knn(q, 5, vvp);
+                            uint64_t t3 = now_ms();
+
+                            writeCSVRow(out, {
+                                (double)s,
+                                (double)(t1 - t0),
+                                (double)(t3 - t2)
+                            });
+                        }
+
+                        out.close();
+                        runPython("plots/knn_vs_size.py");
+                        break;
+                    }
+
+                    case 3: {
+                        std::vector<int> sizes = {1000,5000,10000};
+                        std::ofstream out("results/results_nodes_visited.csv");
+                        out << "Size,Visited_KD,Visited_VP\n";
+
+                        for (int s : sizes) {
+                            std::string fname = "data/set_N_Visited/" + std::to_string(20) + "Dim_"+std::to_string(s)+"len.csv";
+                            auto data = loadCSV(fname);
+                            size_t d = data[0].dimension();
+                            Point q = data[0];
+
+                            KDTree kd(d);
+                            VPTree vp;
+                            kd.build(data);
+                            vp.build(data);
+
+                            size_t vkd = 0, vvp = 0;
+                            kd.knn(q, 5, vkd);
+                            vp.knn(q, 5, vvp);
+
+                            writeCSVRow(out, {
+                                (double)s,
+                                (double)vkd,
+                                (double)vvp
+                            });
+                        }
+
+                        out.close();
+                        runPython("plots/nodes_visited.py");
+                        break;
+                    }
+
+                    case 4: {
+                        std::vector<int> sizes = {1000,10000,50000,100000};
+                        std::ofstream out("results/results_build_time.csv");
+                        out << "Size,Build_KD,Build_VP\n";
+
+                        for (int s : sizes) {
+                            std::string fname = "data/set_BuildTime/" + std::to_string(20) + "Dim_"+std::to_string(s)+"len.csv";
+                            auto data = loadCSV(fname);
+                            size_t d = data[0].dimension();
+
+                            uint64_t t0 = now_ms();
+                            KDTree kd(d);
+                            kd.build(data);
+                            uint64_t t1 = now_ms();
+
+                            uint64_t t2 = now_ms();
+                            VPTree vp;
+                            vp.build(data);
+                            uint64_t t3 = now_ms();
+
+                            writeCSVRow(out, {
+                                (double)s,
+                                (double)(t1 - t0),
+                                (double)(t3 - t2)
+                            });
+                        }
+
+                        out.close();
+                        runPython("plots/build_time.py");
+                        break;
+                    }
+
+                    case 0:
+                        //Volver al menu principal
+                        break;
+                    default:
+                        std::cout << "Opcion invalida.\n";
+                }
+                break;
+            }
             case 0:
                 std::cout << "Saliendo...\n";
                 break;

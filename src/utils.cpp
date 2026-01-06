@@ -84,3 +84,49 @@ uint64_t now_ms() {
         steady_clock::now().time_since_epoch()
     ).count();
 }
+
+// ------------------------------------------------------------
+// Ayudas
+// ------------------------------------------------------------
+
+void printMenu() {
+    std::cout << "\n===== MENU =====\n";
+    std::cout << "1. Construir KD-Tree\n";
+    std::cout << "2. Construir VP-Tree\n";
+    std::cout << "3. Buscar NN (KD-Tree)\n"; //ELIMINAR
+    std::cout << "4. Buscar KNN (KD-Tree)\n";
+    std::cout << "5. Buscar KNN (VP-Tree)\n";
+    std::cout << "6. Mostrar memoria usada\n";
+    std::cout << "7. Comparativas\n";
+    std::cout << "0. Salir\n";
+    std::cout << "Opcion: ";
+}
+
+void CompMenu() {
+    std::cout << "\n===== COMPARATIVAS =====\n";
+    std::cout << "1. Tiempo de busqueda KNN vs Dimensionalidad\n";
+    std::cout << "2. Tiempo de busqueda KNN vs Tamaño del dataset\n";
+    std::cout << "3. Numero de Nodos Visitados\n";
+    std::cout << "4. Tiempo de Construccion del arbol\n";
+    std::cout << "0. Volver al menú principal\n";
+    std::cout << "Opcion: ";
+}
+
+void runPython(const std::string& script) {
+#ifdef _WIN32
+    std::string cmd = "python " + script;
+#else
+    std::string cmd = "python3 " + script;
+#endif
+    system(cmd.c_str());
+}
+
+
+void writeCSVRow(std::ofstream& out,
+                 const std::vector<double>& values) {
+    for (size_t i = 0; i < values.size(); ++i) {
+        out << values[i];
+        if (i + 1 < values.size()) out << ",";
+    }
+    out << "\n";
+}
