@@ -21,7 +21,11 @@ void printMenu() {
 
 int main() {
     try {
-        const std::string file = "data/2000Dim_1000len.csv";
+        const std::string dir = "data/";
+        std::string file;
+        std::cout << "Ingrese el nombre del archivo: ";
+        std::cin >> file;
+        file = dir + file;
 
         std::cout << "Cargando dataset...\n";
         std::vector<Point> pts = loadCSV(file);
@@ -35,6 +39,7 @@ int main() {
         std::cout << "Se cargaron " << pts.size()
                   << " puntos con " << dims << " dimensiones.\n";
 
+        //PARA QUE SEA DIMANICO ESTO PONER DESDE INPUT, POR AHORA SOLO PRUEBA
         Point query = pts[5];
 
         KDTree kdTree(dims);
@@ -53,8 +58,11 @@ int main() {
             case 1: {
                 std::cout << "Construyendo KD-Tree...\n";
                 uint64_t t0 = now_ms();
+                kdTree.build(pts);
+                /*
                 for (const auto& p : pts)
                     kdTree.insert(p);
+                */
                 uint64_t t1 = now_ms();
 
                 kd_built = true;

@@ -19,6 +19,9 @@ struct KNNComparator {
 class KDTree {
 public:
     KDTree(size_t dimensions);
+
+    void build(const std::vector<Point>& points);
+
     void insert(const Point &p);
     Point nearest_neighbor(const Point &target) const;
     size_t memoryUsage() const; // estimación simple segun gpt,revisen
@@ -27,25 +30,32 @@ public:
 
 private:
     struct Node {
-    Point point;
-    size_t axis;                     // 1. axis primero
-    std::unique_ptr<Node> left;      // 2. left después
-    std::unique_ptr<Node> right;
+        Point point;
+        size_t axis;                     // 1. axis primero
+        std::unique_ptr<Node> left;      // 2. left después
+        std::unique_ptr<Node> right;
 
     Node(const Point& p, size_t axis)
         : point(p), axis(axis), left(nullptr), right(nullptr)
     {}
-};
+    };
 
     std::unique_ptr<Node> root;
     size_t dims;
     size_t node_count = 0;
 
+    std::unique_ptr<Node> build_recursive(
+        std::vector<Point>& pts,
+        size_t depth
+    );
+
     void insert_recursive(std::unique_ptr<Node> &node, const Point &p, size_t depth);
+
     void nn_recursive(const Node *node, const Point &target,
                       Point &best, double &best_dist) const;
 
     double distance_sq(const Point &a, const Point &b) const;
+
     void knn_recursive(
         const Node* node,
         const Point& target,

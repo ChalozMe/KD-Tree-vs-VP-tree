@@ -7,6 +7,50 @@
 
 KDTree::KDTree(size_t dimensions) : root(nullptr), dims(dimensions), node_count(0) {}
 
+void KDTree::build(const std::vector<Point>& points) {
+    if (points.empty()) {
+        root.reset();
+        node_count = 0;
+        return;
+    }
+
+    std::vector<Point> pts = points; // copia de trabajo
+    node_count = pts.size();
+    root = build_recursive(pts, 0);
+}
+
+std::unique_ptr<KDTree::Node>
+KDTree::build_recursive(std::vector<Point>& pts, size_t depth) {
+    if (pts.empty())
+        return nullptr;
+
+    size_t axis = depth % dims;
+    size_t mid  = pts.size() / 2;
+
+    // Partición por mediana en el eje actual
+    std::nth_element(
+        pts.begin(),
+        pts.begin() + mid,
+        pts.end(),
+        [axis](const Point& a, const Point& b) {
+            return a[axis] < b[axis];
+        }
+    );
+
+    // Crear nodo con la mediana
+    auto node = std::make_unique<Node>(pts[mid], axis);
+
+    // Subconjuntos
+    std::vector<Point> leftPts(pts.begin(), pts.begin() + mid);
+    std::vector<Point> rightPts(pts.begin() + mid + 1, pts.end());
+
+    node->left  = build_recursive(leftPts,  depth + 1);
+    node->right = build_recursive(rightPts, depth + 1);
+
+    return node;
+}
+
+
 void KDTree::insert(const Point &p) {
     insert_recursive(root, p, 0);
 }
