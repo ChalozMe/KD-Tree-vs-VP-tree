@@ -108,10 +108,12 @@ int main() {
                 std::cout << "Ingrese K: ";
                 std::cin >> K;
 
-                uint64_t t0 = now_ms();
-                auto neighbors = kdTree.knn(query, K);
-                uint64_t t1 = now_ms();
+                size_t visiteDKD = 0;
 
+                uint64_t t0 = now_ms();
+                auto neighbors = kdTree.knn(query, K,visiteDKD);
+                uint64_t t1 = now_ms();
+                std::cout << "Nodos visitados (KD-Tree): " << visiteDKD << "\n";
                 for (size_t i = 0; i < neighbors.size(); ++i)
                     std::cout << "NN " << i+1
                               << " dist = " << neighbors[i].second << "\n";
@@ -128,11 +130,11 @@ int main() {
                 int K;
                 std::cout << "Ingrese K: ";
                 std::cin >> K;
-
+                size_t visiteDVP = 0;
                 uint64_t t0 = now_ms();
-                auto neighbors = vpTree.knn(query, K);
+                auto neighbors = vpTree.knn(query, K,visiteDVP);
                 uint64_t t1 = now_ms();
-
+                std::cout << "Nodos visitados (VP-Tree): " << visiteDVP << "\n";
                 for (size_t i = 0; i < neighbors.size(); ++i)
                     std::cout << "NN " << i+1
                               << " dist = " << neighbors[i].second << "\n";

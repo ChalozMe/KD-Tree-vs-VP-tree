@@ -25,7 +25,7 @@ public:
     void insert(const Point &p);
     Point nearest_neighbor(const Point &target) const;
     size_t memoryUsage() const; // estimación simple segun gpt,revisen
-    std::vector<std::pair<Point,double>> knn(const Point& target, int k) const;
+    std::vector<std::pair<Point,double>> knn(const Point& target, int k, size_t& visited) const;
 
 
 private:
@@ -64,7 +64,8 @@ private:
             std::pair<double,Point>,
             std::vector<std::pair<double,Point>>,
             KNNComparator
-        >& heap
+        >& heap,
+        size_t& visited
     ) const;
 
 

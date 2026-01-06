@@ -127,7 +127,8 @@ size_t KDTree::memoryUsage() const {
 
 
 //KNN TRY
-std::vector<std::pair<Point,double>> KDTree::knn(const Point& target, int k) const {
+std::vector<std::pair<Point,double>> KDTree::knn(const Point& target, int k, size_t& visited) const {
+    visited = 0;
     if (!root || k <= 0) return {};
 
     std::priority_queue<
@@ -136,7 +137,7 @@ std::vector<std::pair<Point,double>> KDTree::knn(const Point& target, int k) con
         KNNComparator
     > heap;
 
-    knn_recursive(root.get(), target, k, heap);
+    knn_recursive(root.get(), target, k, heap, visited);
 
     std::vector<std::pair<Point,double>> result;
     while (!heap.empty()) {
@@ -157,9 +158,12 @@ void KDTree::knn_recursive(
         std::pair<double,Point>,
         std::vector<std::pair<double,Point>>,
         KNNComparator
-    >& heap
+    >& heap,
+    size_t& visited
 ) const {
     if (!node) return;
+
+    ++visited; //NODO VISITADO
 
     double d = distance_sq(node->point, target);
 
@@ -178,11 +182,11 @@ void KDTree::knn_recursive(
     const Node* first  = go_left ? node->left.get()  : node->right.get();
     const Node* second = go_left ? node->right.get() : node->left.get();
 
-    knn_recursive(first, target, k, heap);
+    knn_recursive(first, target, k, heap, visited);
 
     double diff = target[axis] - node->point[axis];
     double diff_sq = diff * diff;
 
     if ((int)heap.size() < k || diff_sq < heap.top().first)
-        knn_recursive(second, target, k, heap);
+        knn_recursive(second, target, k, heap, visited);
 }

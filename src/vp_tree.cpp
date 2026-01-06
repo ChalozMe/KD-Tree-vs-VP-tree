@@ -118,15 +118,16 @@ void VPTree::search_nn(const Node* node, const Point& q, Point& best, double& be
     }
 }
 
-std::vector<std::pair<Point,double>> VPTree::knn(const Point& q, int k) const {
+std::vector<std::pair<Point,double>> VPTree::knn(const Point& q, int k, size_t& visited) const {
     std::vector<std::pair<Point,double>> empty;
+    visited = 0;
     if (!root || k <= 0) return empty;
 
     std::priority_queue<std::pair<double,Point>,
                         std::vector<std::pair<double,Point>>,
                         VPKNNComparator> heap;
 
-    knn_search(root.get(), q, k, heap);
+    knn_search(root.get(), q, k, heap, visited);
 
     std::vector<std::pair<Point,double>> result;
     while (!heap.empty()) {
@@ -140,8 +141,10 @@ std::vector<std::pair<Point,double>> VPTree::knn(const Point& q, int k) const {
 void VPTree::knn_search(const Node* node, const Point& q, int k,
                         std::priority_queue<std::pair<double,Point>,
                                             std::vector<std::pair<double,Point>>,
-                                            VPKNNComparator>& heap) const {
+                                            VPKNNComparator>& heap,size_t& visited) const {
     if (!node) return;
+
+    ++visited; //NODO VISITADO
 
     double d2 = dist_sq(q, node->vp);
 
@@ -165,13 +168,13 @@ void VPTree::knn_search(const Node* node, const Point& q, int k,
         second = node->left.get();
     }
 
-    if (first) knn_search(first, q, k, heap);
+    if (first) knn_search(first, q, k, heap, visited);
 
     double bound = heap.empty() ? std::numeric_limits<double>::infinity() : std::sqrt(heap.top().first);
     // poda: solo explorar second si |dist_to_vp - radius| <= bound
     if (second) {
         if (std::abs(dist_to_vp - node->radius) <= bound) {
-            knn_search(second, q, k, heap);
+            knn_search(second, q, k, heap,visited);
         }
     }
 }
