@@ -18,21 +18,30 @@ std::vector<Point> loadCSV(const std::string& filename) {
     bool header_skipped = false;
 
     while (std::getline(file, line)) {
-        if (!header_skipped) { 
-            header_skipped = true; 
-            continue; 
+        if (!header_skipped) {
+            header_skipped = true;
+            continue;
         }
 
         std::stringstream ss(line);
         std::string cell;
         std::vector<double> values;
+        int col = 0;
 
         while (std::getline(ss, cell, ',')) {
+            // ignorar id (columna 0)
+            if (col == 0) {
+                col++;
+                continue;
+            }
+
             try {
                 values.push_back(std::stod(cell));
             } catch (...) {
-                // ignorar no numerico
+                // ignora title u otros no numéricos
             }
+
+            col++;
         }
 
         if (!values.empty()) {
@@ -42,6 +51,7 @@ std::vector<Point> loadCSV(const std::string& filename) {
 
     return points;
 }
+
 
 // ------------------------------------------------------------
 // PPRINT (pretty-print c:)
