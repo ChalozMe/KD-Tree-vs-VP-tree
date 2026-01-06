@@ -1,115 +1,159 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
+
 #include "point.hpp"
 #include "kd_tree.hpp"
 #include "vp_tree.hpp"
 #include "utils.hpp"
-#include <fstream>
 
-// ------------------------------------------------------------
-// MAIN DE PRUEBA
-// ------------------------------------------------------------
+void printMenu() {
+    std::cout << "\n===== MENU =====\n";
+    std::cout << "1. Construir KD-Tree\n";
+    std::cout << "2. Construir VP-Tree\n";
+    std::cout << "3. Buscar NN (KD-Tree)\n";
+    std::cout << "4. Buscar KNN (KD-Tree)\n";
+    std::cout << "5. Buscar KNN (VP-Tree)\n";
+    std::cout << "6. Mostrar memoria usada\n";
+    std::cout << "0. Salir\n";
+    std::cout << "Opcion: ";
+}
+
 int main() {
     try {
-        std::cout << "Cargando dataset...\n";
-
         const std::string file = "data/2000Dim_1000len.csv";
 
+        std::cout << "Cargando dataset...\n";
         std::vector<Point> pts = loadCSV(file);
+
         if (pts.empty()) {
-            std::cout << "Dataset vacío.\n";
-            return 0;
+            std::cerr << "Dataset vacío.\n";
+            return 1;
         }
 
         size_t dims = pts[0].dimension();
         std::cout << "Se cargaron " << pts.size()
                   << " puntos con " << dims << " dimensiones.\n";
 
-        std::cout << "\nConstruyendo KD-Tree...\n";
-        KDTree tree(dims);
-        // Insertar todos los puntos
-        for (auto &p : pts) {
-            if (p.dimension() != dims) {
-                std::cerr << "Error: punto con dimensión distinta.\n";
-                return 1;
-            }
-            tree.insert(p);
-        }
-
-        std::cout << "Insercion completada.\n";
-        std::cout << "Memoria aprox: " << tree.memoryUsage() << " bytes\n";
-
-        // Probar KNN (1-NN)
         Point query = pts[5];
-        std::cout << "Consultando NN de un punto del dataset...\n";
-        uint64_t t0 = now_ms();
 
-        Point best = tree.nearest_neighbor(query);
+        KDTree kdTree(dims);
+        VPTree vpTree;
 
-        uint64_t t1 = now_ms();
-        std::cout << "Tiempo utilizado NN " << (t1 - t0) << " us\n";
-        
-        //std::cout << "Query: ";
-        //printPoint(query,2);
-        //std::cout << "\n";
+        bool kd_built = false;
+        bool vp_built = false;
 
-        //std::cout << "NN:    ";
-        //printPoint(best,2);
-        //std::cout << "\n";
+        int option;
+        do {
+            printMenu();
+            std::cin >> option;
 
-        double dist = Point::distance(query, best);
-        std::cout << "Distancia = " << dist << "\n";
+            switch (option) {
 
-        std::cout << "Try KNN:\n";
-        int K = 3;
+            case 1: {
+                std::cout << "Construyendo KD-Tree...\n";
+                uint64_t t0 = now_ms();
+                for (const auto& p : pts)
+                    kdTree.insert(p);
+                uint64_t t1 = now_ms();
 
-        std::cout << "Buscando " << K << " vecinos más cercanos del punto 5...\n";
-        
-        uint64_t t2 = now_ms();
-        auto neighbors = tree.knn(query, K);
-        uint64_t t3 = now_ms();
-        std::cout << "Tiempo utilizado KNN " << (t3 - t2) << " us\n";
+                kd_built = true;
+                std::cout << "KD-Tree construido en "
+                          << (t1 - t0) << " us\n";
+                break;
+            }
 
-        for (size_t i = 0; i < neighbors.size(); i++) {
-            const auto& [p, dist] = neighbors[i];
+            case 2: {
+                std::cout << "Construyendo VP-Tree...\n";
+                uint64_t t0 = now_ms();
+                vpTree.build(pts);
+                uint64_t t1 = now_ms();
 
-            std::cout << "NN " << i+1 << ": ";
-            //printPoint(p,2);
-            std::cout << "   Dist = " << dist << "\n";
-        }
-      
+                vp_built = true;
+                std::cout << "VP-Tree construido en "
+                          << (t1 - t0) << " us\n";
+                break;
+            }
 
-        std::cout << "\nTry KNN (VP-Tree):\n";
+            case 3: {
+                if (!kd_built) {
+                    std::cout << "Primero construye el KD-Tree.\n";
+                    break;
+                }
+                uint64_t t0 = now_ms();
+                Point best = kdTree.nearest_neighbor(query);
+                uint64_t t1 = now_ms();
 
-        VPTree vptree;
+                std::cout << "NN encontrado\n";
+                std::cout << "Distancia: "
+                          << Point::distance(query, best) << "\n";
+                std::cout << "Tiempo: " << (t1 - t0) << " us\n";
+                break;
+            }
 
-        
+            case 4: {
+                if (!kd_built) {
+                    std::cout << "Primero construye el KD-Tree.\n";
+                    break;
+                }
+                int K;
+                std::cout << "Ingrese K: ";
+                std::cin >> K;
 
-        for (const auto& p : pts)
-            vptree.insert(p);
+                uint64_t t0 = now_ms();
+                auto neighbors = kdTree.knn(query, K);
+                uint64_t t1 = now_ms();
 
-        
-        uint64_t t4 = now_ms();
-        auto neighborsVP = vptree.knn(query, K);
-        uint64_t t5 = now_ms();
+                for (size_t i = 0; i < neighbors.size(); ++i)
+                    std::cout << "NN " << i+1
+                              << " dist = " << neighbors[i].second << "\n";
 
-        for (size_t i = 0; i < neighborsVP.size(); ++i) {
-            const auto& [p, dist] = neighborsVP[i];
+                std::cout << "Tiempo: " << (t1 - t0) << " us\n";
+                break;
+            }
 
-            std::cout << "NN " << i+1 << ": ";
-            //printPoint(p,2);
-            std::cout << "   Dist = " << dist << "\n";
-        }
+            case 5: {
+                if (!vp_built) {
+                    std::cout << "Primero construye el VP-Tree.\n";
+                    break;
+                }
+                int K;
+                std::cout << "Ingrese K: ";
+                std::cin >> K;
 
-        std::cout << "Memoria aprox: " << vptree.memoryUsage() << " bytes\n";
-        std::cout << "Tiempo utilizado KNN " << (t5 - t4) << " us\n";
+                uint64_t t0 = now_ms();
+                auto neighbors = vpTree.knn(query, K);
+                uint64_t t1 = now_ms();
 
-        std::ofstream out("results.csv");
-        out << "structure,time_us,memory_bytes\n";
-        out << "KDTree," << (t1 - t0) << "," << tree.memoryUsage() << "\n";
-        out << "VPTree," << (t4 - t3) << "," << vptree.memoryUsage() << "\n";
-        out.close();
+                for (size_t i = 0; i < neighbors.size(); ++i)
+                    std::cout << "NN " << i+1
+                              << " dist = " << neighbors[i].second << "\n";
 
-    } catch (std::exception &e) {
+                std::cout << "Tiempo: " << (t1 - t0) << " us\n";
+                break;
+            }
+
+            case 6: {
+                if (kd_built)
+                    std::cout << "KD-Tree memoria: "
+                              << kdTree.memoryUsage() << " bytes\n";
+                if (vp_built)
+                    std::cout << "VP-Tree memoria: "
+                              << vpTree.memoryUsage() << " bytes\n";
+                break;
+            }
+
+            case 0:
+                std::cout << "Saliendo...\n";
+                break;
+
+            default:
+                std::cout << "Opcion invalida.\n";
+            }
+
+        } while (option != 0);
+
+    } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << "\n";
     }
 
