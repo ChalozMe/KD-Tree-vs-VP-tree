@@ -96,7 +96,7 @@ void printMenu() {
     std::cout << "3. Buscar NN (KD-Tree)\n"; //ELIMINAR
     std::cout << "4. Buscar KNN (KD-Tree)\n";
     std::cout << "5. Buscar KNN (VP-Tree)\n";
-    std::cout << "6. Mostrar memoria usada\n";
+    std::cout << "6. Mostrar memoria usada(Estimado)\n";
     std::cout << "7. Comparativas\n";
     std::cout << "0. Salir\n";
     std::cout << "Opcion: ";
@@ -105,9 +105,10 @@ void printMenu() {
 void CompMenu() {
     std::cout << "\n===== COMPARATIVAS =====\n";
     std::cout << "1. Tiempo de busqueda KNN vs Dimensionalidad\n";
-    std::cout << "2. Tiempo de busqueda KNN vs Tamaño del dataset\n";
+    std::cout << "2. Tiempo de busqueda KNN vs Tamano del dataset\n";
     std::cout << "3. Numero de Nodos Visitados\n";
     std::cout << "4. Tiempo de Construccion del arbol\n";
+    std::cout << "5. Tiempo de Insercion en Diferentes Tamanos\n";
     std::cout << "0. Volver al menú principal\n";
     std::cout << "Opcion: ";
 }

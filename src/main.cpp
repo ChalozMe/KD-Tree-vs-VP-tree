@@ -290,6 +290,42 @@ int main() {
                         runPython("plots/build_time.py");
                         break;
                     }
+                    case 5: {
+                        std::vector<int> sizes = {1000,5000,10000};
+                        std::ofstream out("results/results_insertion_time.csv");
+                        out << "Size,Insert_KD,Insert_VP\n";
+
+                        for (int s : sizes) {
+                            std::string fname = "data/set_InsertTime/" + std::to_string(20) + "Dim_"+std::to_string(s)+"len.csv";
+                            auto data = loadCSV(fname);
+                            size_t d = data[0].dimension();
+
+                            KDTree kd(d);
+                            VPTree vp;
+                            kd.build(data);
+                            vp.build(data);
+
+                            Point new_point(std::vector<double>(d, 0.5)); // punto de prueba
+
+                            uint64_t t0 = now_ms();
+                            kd.insert(new_point);
+                            uint64_t t1 = now_ms();
+
+                            uint64_t t2 = now_ms();
+                            vp.insert(new_point);
+                            uint64_t t3 = now_ms();
+
+                            writeCSVRow(out, {
+                                (double)s,
+                                (double)(t1 - t0),
+                                (double)(t3 - t2)
+                            });
+                        }
+
+                        out.close();
+                        runPython("plots/insertion_time.py");
+                        break;
+                    }
 
                     case 0:
                         //Volver al menu principal
