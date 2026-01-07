@@ -291,6 +291,39 @@ int main() {
                         break;
                     }
 
+                    case 5: {
+                        std::vector<int> sizes = {1000, 10000, 50000, 100000};
+                        std::ofstream out("results/results_memory_usage.csv");
+                        out << "Size,Memory_KD,Memory_VP\n"; // cambiar encabezado
+
+                        for (int s : sizes) {
+                            std::string fname =
+                            "data/set_Memory/" + std::to_string(20) + "Dim_" +
+                            std::to_string(s) + "len.csv";
+
+                            auto data = loadCSV(fname);
+                            size_t d = data[0].dimension();
+
+                            KDTree kd(d);
+                            kd.build(data);
+                            size_t mem_kd = kd.memoryUsage() / 1024;
+
+                            VPTree vp;
+                            vp.build(data);
+                            size_t mem_vp = vp.memoryUsage() / 1024;
+
+                            writeCSVRow(out, {
+                                (double)s,
+                                        (double)mem_kd,
+                                        (double)mem_vp
+                            });
+                        }
+
+                        out.close();
+                        runPython("plots/memory_usage.py");
+                        break;
+                    }
+
                     case 0:
                         //Volver al menu principal
                         break;

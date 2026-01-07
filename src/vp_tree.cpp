@@ -180,5 +180,11 @@ void VPTree::knn_search(const Node* node, const Point& q, int k,
 }
 
 size_t VPTree::memoryUsage() const {
-    return node_count * sizeof(Node);
+    size_t mem = 0;
+    mem += node_count * sizeof(Node);
+    mem += points_storage.capacity() * sizeof(Point);
+    for (const auto& p : points_storage) {
+        mem += p.getCoords().capacity() * sizeof(double);
+    }
+    return mem;
 }

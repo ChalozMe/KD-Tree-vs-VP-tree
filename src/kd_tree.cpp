@@ -119,8 +119,9 @@ double KDTree::distance_sq(const Point &a, const Point &b) const {
 }
 
 size_t KDTree::memoryUsage() const {
-    // estimación simple: tamaño de Node * cantidad de nodos (segun GPT es asi, revisar correctitud)
-    return node_count * sizeof(Node);
+    size_t node_struct = sizeof(Node);
+    size_t point_data  = sizeof(double) * dims;
+    return node_count * (node_struct + point_data);
 }
 
 

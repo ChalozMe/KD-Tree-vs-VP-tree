@@ -8,12 +8,14 @@
 *.lib
 *.out
 *.exe
+*.csv
 
 # Carpetas de construcción
 /build/
 build/
 cmake-build-*/
 CMakeFiles/
+data/
 
 # Archivos generados por CMake
 CMakeCache.txt
